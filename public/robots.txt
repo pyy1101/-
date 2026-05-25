@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://devtools.pages.dev/sitemap.xml
+Sitemap: https://www.devshells.com/sitemap.xml

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://devtools.pages.dev/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://devtools.pages.dev/json-formatter</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://devtools.pages.dev/base64</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://devtools.pages.dev/word-counter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/timestamp</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/uuid-generator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://devtools.pages.dev/color-picker</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://devtools.pages.dev/markdown-preview</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://devtools.pages.dev/image-compress</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/url-encoder</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://devtools.pages.dev/hash-generator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/regex-tester</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/qr-code</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/diff-checker</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://devtools.pages.dev/ip-lookup</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://devtools.pages.dev/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.devshells.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.devshells.com/json-formatter</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.devshells.com/base64</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.devshells.com/word-counter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/timestamp</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/uuid-generator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.devshells.com/color-picker</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.devshells.com/markdown-preview</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.devshells.com/image-compress</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/url-encoder</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.devshells.com/hash-generator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/regex-tester</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/qr-code</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/diff-checker</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.devshells.com/ip-lookup</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.devshells.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
