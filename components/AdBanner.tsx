@@ -1,13 +1,40 @@
 "use client";
 
-import { ADSENSE_CLIENT_ID, AD_SLOTS, ADSENSE_ENABLED } from "@/lib/adsense";
+import { useEffect, useRef } from "react";
+import { ADSENSE_ENABLED } from "@/lib/adsense";
 
 interface AdBannerProps {
-  slot: keyof typeof AD_SLOTS;
+  slot: "top" | "sidebar" | "bottom";
   className?: string;
 }
 
+const AD_CONFIG = {
+  top: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 90, width: 728 },
+  sidebar: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 250, width: 300 },
+  bottom: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 90, width: 728 },
+};
+
+const SCRIPT_LOADED = { current: false };
+
 export default function AdBanner({ slot, className = "" }: AdBannerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ADSENSE_ENABLED) return;
+
+    const cfg = AD_CONFIG[slot];
+    const container = containerRef.current;
+    if (!container || container.querySelector("iframe")) return;
+
+    const atOpt = document.createElement("script");
+    atOpt.textContent = `atOptions = {'key':'${cfg.key}','format':'iframe','height':${cfg.height},'width':${cfg.width},'params':{}};`;
+    container.appendChild(atOpt);
+
+    const invoke = document.createElement("script");
+    invoke.src = "https://www.highperformanceformat.com/cf1b663b00c8ff37e1ef479c73a076ca/invoke.js";
+    container.appendChild(invoke);
+  }, [slot]);
+
   if (!ADSENSE_ENABLED) {
     return (
       <div
@@ -19,5 +46,5 @@ export default function AdBanner({ slot, className = "" }: AdBannerProps) {
     );
   }
 
-  return <ins className="adsbygoogle" style={{ display: "block" }} data-ad-client={ADSENSE_CLIENT_ID} data-ad-slot={AD_SLOTS[slot]} data-ad-format="auto" data-full-width-responsive="true" />;
+  return <div ref={containerRef} className={className} />;
 }
