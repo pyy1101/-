@@ -10,7 +10,7 @@ interface AdBannerProps {
 
 const AD_CONFIG = {
   top: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 90, width: 728 },
-  sidebar: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 250, width: 300 },
+  sidebar: { key: "54a904c47048e64d427a89b8749d20c8", height: 250, width: 300 },
   bottom: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 90, width: 728 },
 };
 
