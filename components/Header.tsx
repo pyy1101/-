@@ -11,11 +11,12 @@ export default function Header() {
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 h-14">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg text-blue-600 hover:text-blue-700">
           <span className="text-2xl">🔧</span>
-          <span>DevTools</span>
+          <span>DevShells</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
-          <Link href="/" className="hover:text-blue-600 transition-colors">首页</Link>
+          <Link href="/" className="hover:text-blue-600 transition-colors">中文</Link>
+          <Link href="/en" className="hover:text-blue-600 transition-colors">English</Link>
           <Link href="/privacy" className="hover:text-blue-600 transition-colors">隐私政策</Link>
         </nav>
 
@@ -36,7 +37,8 @@ export default function Header() {
 
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2">
-          <Link href="/" className="block text-sm text-gray-600 hover:text-blue-600 py-1" onClick={() => setMenuOpen(false)}>首页</Link>
+          <Link href="/" className="block text-sm text-gray-600 hover:text-blue-600 py-1" onClick={() => setMenuOpen(false)}>中文</Link>
+          <Link href="/en" className="block text-sm text-gray-600 hover:text-blue-600 py-1" onClick={() => setMenuOpen(false)}>English</Link>
           <Link href="/privacy" className="block text-sm text-gray-600 hover:text-blue-600 py-1" onClick={() => setMenuOpen(false)}>隐私政策</Link>
         </div>
       )}

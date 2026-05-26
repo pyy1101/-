@@ -8,8 +8,8 @@ const GA_ID = "G-XXXXXXXXXX"; // 替换为你的 Google Analytics ID
 
 export const metadata: Metadata = {
   title: {
-    default: "DevTools — 免费在线开发工具",
-    template: "%s | DevTools",
+    default: "DevShells — 免费在线开发工具",
+    template: "%s | DevShells",
   },
   description: "免费在线开发工具集合，JSON格式化、Base64编解码、字数统计、时间戳转换、UUID生成、颜色选择、Markdown预览、图片压缩等实用在线工具",
   keywords: ["在线工具", "开发工具", "JSON格式化", "Base64", "时间戳", "UUID生成器", "二维码", "正则表达式"],

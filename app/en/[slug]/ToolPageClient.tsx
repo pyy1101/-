@@ -26,13 +26,13 @@ import PxToRem from "@/components/tools/PxToRem";
 const toolComponents: Record<string, React.ComponentType> = {
   "json-formatter": JsonFormatter,
   "base64": Base64Tool,
+  "url-encoder": UrlEncoder,
   "word-counter": WordCounter,
   "timestamp": TimestampConverter,
   "uuid-generator": UuidGenerator,
   "color-picker": ColorPicker,
   "markdown-preview": MarkdownPreview,
   "image-compress": ImageCompressor,
-  "url-encoder": UrlEncoder,
   "hash-generator": HashGenerator,
   "regex-tester": RegexTester,
   "qr-code": QrCodeGenerator,
@@ -45,7 +45,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   "px-to-rem": PxToRem,
 };
 
-export default function ToolPageClient({ slug }: { slug: string }) {
+export default function EnToolPageClient({ slug }: { slug: string }) {
   const tool = getToolBySlug(slug);
   if (!tool) return null;
 
@@ -54,19 +54,19 @@ export default function ToolPageClient({ slug }: { slug: string }) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-        <Link href="/" className="hover:text-blue-600 transition-colors">首页</Link>
+        <Link href="/en" className="hover:text-blue-600 transition-colors">Home</Link>
         <span>/</span>
-        <Link href={`/en/${slug}`} className="hover:text-blue-600 transition-colors">English</Link>
+        <Link href={`/${slug}`} className="hover:text-blue-600 transition-colors">中文</Link>
         <span>/</span>
-        <span className="text-gray-600">{tool.name}</span>
+        <span className="text-gray-600">{tool.nameEn}</span>
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{tool.name}</h1>
-          <p className="text-gray-500 text-sm mb-6">{tool.description}</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">{tool.nameEn}</h1>
+          <p className="text-gray-500 text-sm mb-6">{tool.descriptionEn}</p>
 
-          {Component ? <Component /> : <p className="text-gray-400 py-12 text-center">工具组件开发中...</p>}
+          {Component ? <Component /> : <p className="text-gray-400 py-12 text-center">Tool component loading...</p>}
         </div>
 
         <aside className="w-full lg:w-72 flex-shrink-0">
