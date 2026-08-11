@@ -2,39 +2,56 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
-const GA_ID = "G-XXXXXXXXXX"; // 替换为你的 Google Analytics ID
+const GA_ID = "G-LN5L09BCX9";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.devshells.com"),
   title: {
     default: "DevShells — 免费在线开发工具",
     template: "%s | DevShells",
   },
   description: "免费在线开发工具集合，JSON格式化、Base64编解码、字数统计、时间戳转换、UUID生成、颜色选择、Markdown预览、图片压缩等实用在线工具",
   keywords: ["在线工具", "开发工具", "JSON格式化", "Base64", "时间戳", "UUID生成器", "二维码", "正则表达式"],
+  manifest: "/manifest.json",
+  robots: { index: true, follow: true },
+  alternates: {
+    languages: { zh: "/", en: "/en" },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" className="h-full">
       <head>
-        {/* 百度统计 */}
-        <Script id="baidu-tongji" strategy="afterInteractive">
+        {/* Theme anti-flicker */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("devshells-theme")||"system";var d=t==="system"?window.matchMedia("(prefers-color-scheme:dark)").matches:t==="dark";if(d)document.documentElement.classList.add("dark")}catch(e){}})();`,
+          }}
+        />
+        {/* Google Analytics */}
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
-            var _hmt = _hmt || [];
-            (function() {
-              var hm = document.createElement("script");
-              hm.src = "https://hm.baidu.com/hm.js?0532d2564af1de20fe063931ae5e7bca";
-              var s = document.getElementsByTagName("script")[0];
-              s.parentNode.insertBefore(hm, s);
-            })();
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
           `}
         </Script>
+        {/* 百度统计 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?0532d2564af1de20fe063931ae5e7bca";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();`,
+          }}
+        />
       </head>
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900 antialiased">
+      <body className="min-h-full flex flex-col bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] antialiased">
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1"><ToastProvider>{children}</ToastProvider></main>
         <Footer />
       </body>
     </html>
