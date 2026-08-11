@@ -1,20 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useLocalStorage } from "@/lib/useLocalStorage";
+import { useDebounce } from "@/lib/useDebounce";
+import { useKeyboardShortcut } from "@/lib/useKeyboardShortcut";
+import { useToast } from "@/components/Toast";
+import { copyToClipboard } from "@/lib/clipboard";
 
 export default function HashGenerator() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useLocalStorage("tool-hash-input", "");
   const [output, setOutput] = useState("");
-  const [algo, setAlgo] = useState("SHA-256");
+  const [algo, setAlgo] = useLocalStorage("tool-hash-algo", "SHA-256");
+  const [loading, setLoading] = useState(false);
+  const [hmacKey, setHmacKey] = useLocalStorage("tool-hash-hmac", "");
+  const [hmacEnabled, setHmacEnabled] = useLocalStorage("tool-hash-hmac-on", false);
+  const { show: toast } = useToast();
+  const debouncedInput = useDebounce(input, 400);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const generate = async () => {
-    if (!input) return;
+    if (!debouncedInput && !fileRef.current?.files?.length) { setOutput(""); return; }
+    setLoading(true);
     try {
-      if (algo === "MD5") {
-        setOutput(md5(input));
+      const encoder = new TextEncoder();
+      const data = encoder.encode(debouncedInput);
+
+      if (algo === "MD5" && !hmacEnabled) {
+        setOutput(md5(debouncedInput));
+        setLoading(false);
+        return;
+      }
+
+      if (hmacEnabled && hmacKey) {
+        const keyData = encoder.encode(hmacKey);
+        const key = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: algo }, false, ["sign"]);
+        const sig = await crypto.subtle.sign("HMAC", key, data);
+        setOutput(Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join(""));
       } else {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(input);
         const hashBuffer = await crypto.subtle.digest(algo, data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         setOutput(hashArray.map((b) => b.toString(16).padStart(2, "0")).join(""));
@@ -22,28 +44,63 @@ export default function HashGenerator() {
     } catch {
       setOutput("计算失败");
     }
+    setLoading(false);
   };
+
+  const hashFile = async (file: File) => {
+    setLoading(true);
+    try {
+      const buffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest(algo, buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      setOutput(hashArray.map((b) => b.toString(16).padStart(2, "0")).join(""));
+      setInput(`[文件: ${file.name}]`);
+    } catch {
+      setOutput("文件哈希计算失败");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { generate(); }, [debouncedInput, algo, hmacEnabled, hmacKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useKeyboardShortcut("Enter", generate);
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap items-center">
-        <select value={algo} onChange={(e) => setAlgo(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+        <select value={algo} onChange={(e) => setAlgo(e.target.value)} className="px-3 py-2 border border-[var(--color-border)] rounded-lg text-sm bg-[var(--color-input)] text-[var(--color-text)]">
           <option value="MD5">MD5</option>
           <option value="SHA-1">SHA-1</option>
           <option value="SHA-256">SHA-256</option>
           <option value="SHA-512">SHA-512</option>
         </select>
-        <button onClick={generate} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">生成哈希</button>
+        <button onClick={generate} disabled={loading} className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50">
+          {loading ? "计算中..." : "生成哈希"}
+        </button>
         {output && (
-          <button onClick={() => navigator.clipboard.writeText(output)} className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">复制</button>
+          <button onClick={() => { if (copyToClipboard(output)) toast("已复制到剪贴板"); }} className="px-4 py-2 border border-[var(--color-border)] rounded-lg text-sm hover:bg-[var(--color-muted)] text-[var(--color-text-dim)]">复制</button>
         )}
+        <label className="flex items-center gap-1 text-sm text-[var(--color-text-dim)] ml-2">
+          <input type="checkbox" checked={hmacEnabled} onChange={(e) => setHmacEnabled(e.target.checked)} className="rounded" />
+          HMAC
+        </label>
+        <input ref={fileRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) hashFile(f); }} />
+        <button onClick={() => fileRef.current?.click()} className="px-4 py-2 border border-[var(--color-border)] rounded-lg text-sm hover:bg-[var(--color-muted)] text-[var(--color-text-dim)]">文件哈希</button>
       </div>
+
+      {hmacEnabled && (
+        <div>
+          <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">HMAC 密钥</label>
+          <input type="text" value={hmacKey} onChange={(e) => setHmacKey(e.target.value)} className="w-full px-3 py-2 border border-[var(--color-border)] rounded-lg font-mono text-sm bg-[var(--color-input)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" placeholder="输入 HMAC 密钥..." spellCheck={false} />
+        </div>
+      )}
+
       <div>
-        <label className="block text-xs text-gray-500 font-medium mb-1">输入文本</label>
-        <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-32 p-3 border border-gray-300 rounded-lg font-mono text-sm resize-y bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="输入任意文本..." spellCheck={false} />
+        <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">输入文本</label>
+        <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-32 p-3 border border-[var(--color-border)] rounded-lg font-mono text-sm resize-y bg-[var(--color-input)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" placeholder="输入任意文本..." spellCheck={false} />
       </div>
       {output && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 font-mono text-sm break-all text-gray-800">{output}</div>
+        <div className="bg-[var(--color-output)] border border-[var(--color-border)] rounded-lg p-4 font-mono text-sm break-all text-[var(--color-text)]">{output}</div>
       )}
     </div>
   );

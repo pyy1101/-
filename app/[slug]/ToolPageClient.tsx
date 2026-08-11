@@ -1,75 +1,67 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { getToolBySlug } from "@/lib/tools";
+import toolComponents from "@/lib/registry";
 import AdBanner from "@/components/AdBanner";
-import JsonFormatter from "@/components/tools/JsonFormatter";
-import Base64Tool from "@/components/tools/Base64Tool";
-import WordCounter from "@/components/tools/WordCounter";
-import TimestampConverter from "@/components/tools/TimestampConverter";
-import UuidGenerator from "@/components/tools/UuidGenerator";
-import ColorPicker from "@/components/tools/ColorPicker";
-import MarkdownPreview from "@/components/tools/MarkdownPreview";
-import ImageCompressor from "@/components/tools/ImageCompressor";
-import UrlEncoder from "@/components/tools/UrlEncoder";
-import HashGenerator from "@/components/tools/HashGenerator";
-import RegexTester from "@/components/tools/RegexTester";
-import QrCodeGenerator from "@/components/tools/QrCodeGenerator";
-import DiffChecker from "@/components/tools/DiffChecker";
-import IpLookup from "@/components/tools/IpLookup";
-import JsonToCsv from "@/components/tools/JsonToCsv";
-import Timer from "@/components/tools/Timer";
-import CssMinifier from "@/components/tools/CssMinifier";
-import HtmlEntity from "@/components/tools/HtmlEntity";
-import PxToRem from "@/components/tools/PxToRem";
-
-const toolComponents: Record<string, React.ComponentType> = {
-  "json-formatter": JsonFormatter,
-  "base64": Base64Tool,
-  "word-counter": WordCounter,
-  "timestamp": TimestampConverter,
-  "uuid-generator": UuidGenerator,
-  "color-picker": ColorPicker,
-  "markdown-preview": MarkdownPreview,
-  "image-compress": ImageCompressor,
-  "url-encoder": UrlEncoder,
-  "hash-generator": HashGenerator,
-  "regex-tester": RegexTester,
-  "qr-code": QrCodeGenerator,
-  "diff-checker": DiffChecker,
-  "ip-lookup": IpLookup,
-  "json-to-csv": JsonToCsv,
-  "timer": Timer,
-  "css-minifier": CssMinifier,
-  "html-entity": HtmlEntity,
-  "px-to-rem": PxToRem,
-};
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { useToast } from "@/components/Toast";
+import { copyToClipboard } from "@/lib/clipboard";
 
 export default function ToolPageClient({ slug }: { slug: string }) {
   const tool = getToolBySlug(slug);
+  const { show: toast } = useToast();
+  const [shared, setShared] = useState(false);
   if (!tool) return null;
 
   const Component = toolComponents[slug];
+  const url = `https://www.devshells.com/${slug}`;
+
+  const shareTwitter = () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tool.name + " — 免费在线开发工具")}&url=${encodeURIComponent(url)}`, "_blank", "noopener");
+  };
+
+  const copyLink = () => {
+    if (copyToClipboard(url)) {
+      setShared(true);
+      toast("链接已复制");
+      setTimeout(() => setShared(false), 2000);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-        <Link href="/" className="hover:text-blue-600 transition-colors">首页</Link>
-        <span>/</span>
-        <Link href={`/en/${slug}`} className="hover:text-blue-600 transition-colors">English</Link>
-        <span>/</span>
-        <span className="text-gray-600">{tool.name}</span>
+      <nav className="flex items-center gap-2 text-sm text-[var(--color-text-faint)] mb-6" aria-label="面包屑导航">
+        <Link href="/" className="hover:text-[var(--color-accent)] transition-colors">首页</Link>
+        <span aria-hidden="true">/</span>
+        <Link href={`/en/${slug}`} className="hover:text-[var(--color-accent)] transition-colors">English</Link>
+        <span aria-hidden="true">/</span>
+        <span className="text-[var(--color-text-dim)]">{tool.name}</span>
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{tool.name}</h1>
-          <p className="text-gray-500 text-sm mb-6">{tool.description}</p>
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-[var(--color-text)] mb-1">{tool.name}</h1>
+              <p className="text-[var(--color-text-dim)] text-sm">{tool.description}</p>
+            </div>
+            <div className="flex gap-2 flex-shrink-0">
+              <button onClick={shareTwitter} aria-label="分享到 Twitter" className="px-3 py-2 border border-[var(--color-border)] rounded-lg text-xs hover:bg-[var(--color-muted)] text-[var(--color-text-dim)]">分享</button>
+              <button onClick={copyLink} aria-label="复制链接" className="px-3 py-2 border border-[var(--color-border)] rounded-lg text-xs hover:bg-[var(--color-muted)] text-[var(--color-text-dim)]">{shared ? "已复制" : "复制链接"}</button>
+            </div>
+          </div>
 
-          {Component ? <Component /> : <p className="text-gray-400 py-12 text-center">工具组件开发中...</p>}
+          {Component ? <ErrorBoundary toolSlug={slug}><Component /></ErrorBoundary> : <p className="text-[var(--color-text-faint)] py-12 text-center">工具组件开发中...</p>}
+
+          <section className="mt-12 pt-8 border-t border-[var(--color-border)]">
+            <h2 className="text-lg font-semibold text-[var(--color-text)] mb-3">关于{tool.name}</h2>
+            <p className="text-[var(--color-text-dim)] leading-relaxed text-sm">{tool.usage}</p>
+          </section>
         </div>
 
-        <aside className="w-full lg:w-72 flex-shrink-0">
+        <aside className="w-full lg:w-72 flex-shrink-0" aria-label="侧边栏广告">
           <div className="sticky top-20 space-y-6">
             <AdBanner slot="sidebar" className="min-h-[250px]" />
           </div>

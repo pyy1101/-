@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { useLocalStorage } from "@/lib/useLocalStorage";
 
 export default function ImageCompressor() {
   const [original, setOriginal] = useState<{ file: File; url: string; size: number } | null>(null);
   const [compressed, setCompressed] = useState<{ url: string; size: number } | null>(null);
-  const [quality, setQuality] = useState(0.7);
-  const [format, setFormat] = useState<"image/jpeg" | "image/png" | "image/webp">("image/jpeg");
-  const [maxWidth, setMaxWidth] = useState(1920);
+  const [quality, setQuality] = useLocalStorage("tool-imgcomp-quality", 0.7);
+  const [format, setFormat] = useLocalStorage<"image/jpeg" | "image/png" | "image/webp">("tool-imgcomp-format", "image/jpeg");
+  const [maxWidth, setMaxWidth] = useLocalStorage("tool-imgcomp-maxwidth", 1920);
   const [compressing, setCompressing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -71,52 +72,52 @@ export default function ImageCompressor() {
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap items-end">
         <div>
-          <label className="block text-xs text-gray-500 font-medium mb-1">输出格式</label>
-          <select value={format} onChange={(e) => setFormat(e.target.value as typeof format)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+          <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">输出格式</label>
+          <select value={format} onChange={(e) => setFormat(e.target.value as typeof format)} className="px-3 py-2 border border-[var(--color-border)] rounded-lg text-sm bg-[var(--color-input)] text-[var(--color-text)]">
             <option value="image/jpeg">JPEG</option>
             <option value="image/png">PNG</option>
             <option value="image/webp">WebP</option>
           </select>
         </div>
         <div>
-          <label className="block text-xs text-gray-500 font-medium mb-1">质量 {Math.round(quality * 100)}%</label>
-          <input type="range" min={0.1} max={1} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-32" />
+          <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">质量 {Math.round(quality * 100)}%</label>
+          <input type="range" min={0.1} max={1} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-32 accent-[var(--color-accent)]" />
         </div>
         <div>
-          <label className="block text-xs text-gray-500 font-medium mb-1">最大宽度 {maxWidth}px</label>
-          <input type="range" min={100} max={3840} step={10} value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="w-32" />
+          <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">最大宽度 {maxWidth}px</label>
+          <input type="range" min={100} max={3840} step={10} value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="w-32 accent-[var(--color-accent)]" />
         </div>
       </div>
 
       <div>
         <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
-        <button onClick={() => inputRef.current?.click()} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+        <button onClick={() => inputRef.current?.click()} className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-accent-hover)]">
           选择图片
         </button>
       </div>
 
       {original && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-600">原图：{original.file.name} ({formatSize(original.size)})</span>
-            <button onClick={compress} disabled={compressing} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50">
+            <span className="text-sm text-[var(--color-text-dim)]">原图：{original.file.name} ({formatSize(original.size)})</span>
+            <button onClick={compress} disabled={compressing} className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50">
               {compressing ? "压缩中..." : "开始压缩"}
             </button>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <div className="text-xs text-gray-500 mb-1">原图预览</div>
-              <img src={original.url} alt="Original" className="max-h-60 rounded-lg border border-gray-200 object-contain bg-gray-100 w-full" />
+              <div className="text-xs text-[var(--color-text-dim)] mb-1">原图预览</div>
+              <img src={original.url} alt="Original" className="max-h-60 rounded-lg border border-[var(--color-border)] object-contain bg-[var(--color-muted)] w-full" />
             </div>
             {compressed && (
               <div>
-                <div className="text-xs text-gray-500 mb-1">
+                <div className="text-xs text-[var(--color-text-dim)] mb-1">
                   压缩后 ({formatSize(compressed.size)}) —
                   减小 {((1 - compressed.size / original.size) * 100).toFixed(1)}%
                 </div>
-                <img src={compressed.url} alt="Compressed" className="max-h-60 rounded-lg border border-green-200 object-contain bg-gray-100 w-full" />
-                <button onClick={download} className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                <img src={compressed.url} alt="Compressed" className="max-h-60 rounded-lg border border-[var(--color-success-border)] object-contain bg-[var(--color-muted)] w-full" />
+                <button onClick={download} className="mt-2 px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-accent-hover)]">
                   下载
                 </button>
               </div>

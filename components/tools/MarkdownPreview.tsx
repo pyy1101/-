@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useLocalStorage } from "@/lib/useLocalStorage";
 
 const defaultMd = `# Markdown 预览
 
@@ -12,6 +13,7 @@ const defaultMd = `# Markdown 预览
 
 - 项目一
 - 项目二
+  - 嵌套项目
 - 项目三
 
 ### 代码演示
@@ -26,51 +28,55 @@ console.log("Hello, World!");
 
 [链接示例](https://example.com)
 
+| 表头1 | 表头2 |
+|-------|-------|
+| 单元格 | 单元格 |
+
 ---
 
 感谢使用！`;
 
-function renderMarkdown(text: string): string {
-  let html = text
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/^### (.+)$/gm, "<h3 class='text-lg font-semibold mt-4 mb-2'>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2 class='text-xl font-semibold mt-5 mb-2'>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1 class='text-2xl font-bold mt-6 mb-3'>$1</h1>")
-    .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/`([^`]+)`/g, "<code class='bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-red-600'>$1</code>")
-    .replace(/```(\w*)\n([\s\S]*?)```/g, "<pre class='bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm my-3'><code>$2</code></pre>")
-    .replace(/^> (.+)$/gm, "<blockquote class='border-l-4 border-blue-400 pl-4 text-gray-600 my-3'>$1</blockquote>")
-    .replace(/^---$/gm, "<hr class='my-4 border-gray-300'>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' class='text-blue-600 hover:underline' target='_blank'>$1</a>")
-    .replace(/^- (.+)$/gm, "<li class='ml-4 list-disc'>$1</li>")
-    .replace(/\n\n/g, "</p><p class='mb-3'>")
-    .replace(/\n/g, "<br>");
-
-  html = "<p class='mb-3'>" + html + "</p>";
-  return html;
-}
-
 export default function MarkdownPreview() {
-  const [markdown, setMarkdown] = useState(defaultMd);
+  const [markdown, setMarkdown] = useLocalStorage("tool-markdown-input", defaultMd);
+  const [html, setHtml] = useState("");
+
+  useEffect(() => {
+    if (!markdown.trim()) { setHtml(""); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const [{ marked }, DOMPurify] = await Promise.all([
+          import("marked"),
+          import("dompurify"),
+        ]);
+        if (cancelled) return;
+        const raw = marked.parse(markdown, { breaks: true, gfm: true }) as string;
+        const sanitized = DOMPurify.default.sanitize(raw, {
+          ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "p", "br", "hr", "ul", "ol", "li", "blockquote", "pre", "code", "em", "strong", "del", "a", "img", "table", "thead", "tbody", "tr", "th", "td", "input"],
+          ALLOWED_ATTR: ["href", "src", "alt", "title", "target", "rel", "class", "checked", "type", "disabled"],
+        });
+        if (!cancelled) setHtml(sanitized);
+      } catch { if (!cancelled) setHtml(""); }
+    })();
+    return () => { cancelled = true; };
+  }, [markdown]);
 
   return (
     <div className="grid sm:grid-cols-2 gap-4">
       <div>
-        <label className="block text-xs text-gray-500 font-medium mb-1">Markdown 输入</label>
+        <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">Markdown 输入</label>
         <textarea
           value={markdown}
           onChange={(e) => setMarkdown(e.target.value)}
-          className="w-full h-[500px] p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full h-[500px] p-4 border border-[var(--color-border)] rounded-lg font-mono text-sm resize-y bg-[var(--color-input)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           spellCheck={false}
         />
       </div>
       <div>
-        <label className="block text-xs text-gray-500 font-medium mb-1">实时预览</label>
+        <label className="block text-xs text-[var(--color-text-dim)] font-medium mb-1">实时预览</label>
         <div
-          className="w-full h-[500px] p-4 border border-gray-300 rounded-lg bg-white overflow-y-auto text-sm text-gray-800 leading-relaxed overflow-x-hidden"
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(markdown) }}
+          className="w-full h-[500px] p-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-card)] overflow-y-auto overflow-x-hidden"
+          dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
     </div>

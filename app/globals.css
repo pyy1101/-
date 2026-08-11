@@ -1,17 +1,105 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-border-primary: #d1d5db;
+  --color-border-secondary: #e5e7eb;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-light: #eff6ff;
+  --color-success-bg: #f0fdf4;
+  --color-success-text: #166534;
+  --color-success-border: #bbf7d0;
+  --color-error-bg: #fef2f2;
+  --color-error-text: #991b1b;
+  --color-error-border: #fecaca;
+  --color-warning-bg: #fffbeb;
+  --color-warning-text: #92400e;
+  --color-warning-border: #fde68a;
+  --color-card-bg: #ffffff;
+  --color-input-bg: #ffffff;
+  --color-output-bg: #f9fafb;
+  --color-code-bg: #f1f5f9;
+  --color-header-bg: rgba(255, 255, 255, 0.95);
+  --color-footer-bg: #f9fafb;
+  --color-popular-bg: #fff7ed;
+  --color-popular-text: #c2410c;
+}
+
+.dark {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+  --color-border-primary: #475569;
+  --color-border-secondary: #334155;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-accent-light: #1e3a5f;
+  --color-success-bg: #052e16;
+  --color-success-text: #86efac;
+  --color-success-border: #166534;
+  --color-error-bg: #450a0a;
+  --color-error-text: #fca5a5;
+  --color-error-border: #991b1b;
+  --color-warning-bg: #422006;
+  --color-warning-text: #fcd34d;
+  --color-warning-border: #92400e;
+  --color-card-bg: #1e293b;
+  --color-input-bg: #1e293b;
+  --color-output-bg: #0f172a;
+  --color-code-bg: #1e293b;
+  --color-header-bg: rgba(15, 23, 42, 0.95);
+  --color-footer-bg: #0f172a;
+  --color-popular-bg: #422006;
+  --color-popular-text: #fbbf24;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--color-bg-primary);
+  --color-surface-alt: var(--color-bg-secondary);
+  --color-muted: var(--color-bg-tertiary);
+  --color-text: var(--color-text-primary);
+  --color-text-dim: var(--color-text-secondary);
+  --color-text-faint: var(--color-text-tertiary);
+  --color-border: var(--color-border-primary);
+  --color-border-light: var(--color-border-secondary);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-light: var(--color-accent-light);
+  --color-success: var(--color-success-bg);
+  --color-success-text: var(--color-success-text);
+  --color-success-border: var(--color-success-border);
+  --color-error: var(--color-error-bg);
+  --color-error-text: var(--color-error-text);
+  --color-error-border: var(--color-error-border);
+  --color-warning: var(--color-warning-bg);
+  --color-warning-text: var(--color-warning-text);
+  --color-warning-border: var(--color-warning-border);
+  --color-card: var(--color-card-bg);
+  --color-input: var(--color-input-bg);
+  --color-output: var(--color-output-bg);
+  --color-code: var(--color-code-bg);
+  --color-header: var(--color-header-bg);
+  --color-footer: var(--color-footer-bg);
+  --color-popular: var(--color-popular-bg);
+  --color-popular-text: var(--color-popular-text);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
