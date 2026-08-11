@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ADSENSE_ENABLED } from "@/lib/adsense";
 
 interface AdBannerProps {
@@ -14,10 +14,9 @@ const AD_CONFIG = {
   bottom: { key: "cf1b663b00c8ff37e1ef479c73a076ca", height: 90, width: 728 },
 };
 
-const SCRIPT_LOADED = { current: false };
-
 export default function AdBanner({ slot, className = "" }: AdBannerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (!ADSENSE_ENABLED) return;
@@ -28,17 +27,20 @@ export default function AdBanner({ slot, className = "" }: AdBannerProps) {
 
     const atOpt = document.createElement("script");
     atOpt.textContent = `atOptions = {'key':'${cfg.key}','format':'iframe','height':${cfg.height},'width':${cfg.width},'params':{}};`;
-    container.appendChild(atOpt);
 
     const invoke = document.createElement("script");
-    invoke.src = "https://www.highperformanceformat.com/cf1b663b00c8ff37e1ef479c73a076ca/invoke.js";
+    invoke.src = `https://www.highperformanceformat.com/${cfg.key}/invoke.js`;
+    invoke.onload = () => setLoaded(true);
+    invoke.onerror = () => setLoaded(true); // still hide placeholder on error
+
+    container.appendChild(atOpt);
     container.appendChild(invoke);
   }, [slot]);
 
   if (!ADSENSE_ENABLED) {
     return (
       <div
-        className={`flex items-center justify-center bg-gray-50 border border-dashed border-gray-300 rounded-lg text-gray-400 text-sm ${className}`}
+        className={`flex items-center justify-center bg-[var(--color-muted)] border border-dashed border-[var(--color-border)] rounded-lg text-[var(--color-text-faint)] text-sm ${className}`}
         style={{ minHeight: slot === "sidebar" ? 250 : 90 }}
       >
         Ad — {slot}
@@ -46,5 +48,16 @@ export default function AdBanner({ slot, className = "" }: AdBannerProps) {
     );
   }
 
-  return <div ref={containerRef} className={className} />;
+  const minH = slot === "sidebar" ? 250 : 90;
+
+  return (
+    <div className={`relative ${className}`} style={{ minHeight: minH }}>
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-muted)] border border-dashed border-[var(--color-border)] rounded-lg text-[var(--color-text-faint)] text-sm">
+          Loading ad...
+        </div>
+      )}
+      <div ref={containerRef} />
+    </div>
+  );
 }
