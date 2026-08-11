@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     title: "DevShells — 免费在线开发工具集合",
     description: "30+ 免费在线开发工具，JSON格式化、Base64编解码、时间戳转换等，打开即用",
   },
+  other: {
+    "baidu-site-verification": "codeva-NdClIawyYR",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
